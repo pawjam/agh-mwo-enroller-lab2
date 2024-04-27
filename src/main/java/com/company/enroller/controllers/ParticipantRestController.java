@@ -17,11 +17,6 @@ public class ParticipantRestController {
 	@Autowired
 	ParticipantService participantService;
 
-	@RequestMapping(value = "", method = RequestMethod.GET)
-	public ResponseEntity<?> getParticipants() {
-		Collection<Participant> participants = participantService.getAll();
-		return new ResponseEntity<Collection<Participant>>(participants, HttpStatus.OK);
-	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public ResponseEntity<?> getParticipant(@PathVariable("id") String login) {
@@ -32,15 +27,14 @@ public class ParticipantRestController {
 		return new ResponseEntity<Participant>(participant, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "", method = RequestMethod.POST)
-	public ResponseEntity<?> addParticipant(@RequestBody Participant participant) {
-		if (participantService.findByLogin(participant.getLogin()) != null) {
-			return new ResponseEntity<String>(
-					"Unable to create. A participant with login " + participant.getLogin() + " already exist.",
-					HttpStatus.CONFLICT);
-		}
-		participantService.add(participant);
-		return new ResponseEntity<Participant>(participant, HttpStatus.CREATED);
+	@RequestMapping(value = "", method = RequestMethod.GET)
+	public ResponseEntity<?> getParticipants(
+			@RequestParam(value = "loginValue", defaultValue = "") String loginValue,
+			@RequestParam(value = "sortBy", defaultValue = "") String sortBy,
+			@RequestParam(value = "sortOrder", defaultValue = "") String sortOrder
+	) {
+		Collection<Participant> participants = participantService.getAll(loginValue, sortBy, sortOrder);
+		return new ResponseEntity<Collection<Participant>>(participants, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -63,5 +57,7 @@ public class ParticipantRestController {
 		participantService.update(participant);
 		return new ResponseEntity<Participant>(HttpStatus.OK);
 	}
+
+
 
 }
